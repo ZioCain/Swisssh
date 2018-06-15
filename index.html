@@ -250,6 +250,20 @@
 		function restart(){
 			location.href=location.href;
 		}
+		var ts={x:0,y:0};
+		document.ontouchstart=function(e){
+			console.log(e);
+			ts.x=e.touches[0].clientX;
+			ts.y=e.touches[0].clientY;
+		};
+		document.ontouchmove=function(e){
+			console.log(e);
+			var t={x:e.touches[0].clientX, y:e.changedTouches[0].clientY};
+			if(ts.x>t.x)campos.x=-2.5;
+			if(ts.x<t.x)campos.x=2.5;
+			if(ts.y>t.y)campos.y=2.5;
+			if(ts.y<t.y)campos.y=-2.5;
+		}
 		function handleKeypress(e){
 			var key=e.key;
 		    switch(key){
