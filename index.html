@@ -1,0 +1,101 @@
+<html>
+	<head>
+		<title>Swisssh</title>
+		<script src="https://aframe.io/releases/0.8.0/aframe.min.js"></script>
+		<style>
+		#info{
+			position: fixed;
+			top:0;
+			left:0;
+			z-index: 10;
+			color:#fff;
+			font-family: monospace;
+			padding:1rem;
+		}
+		</style>
+	</head>
+	<body>
+		<a-scene id="scene">
+			<a-camera id="camera" wasd-controls-enabled="false"></a-camera>
+			<a-entity id="tunnel-base">
+				<a-plane position="5 0 -25" rotation="0 -90 90" width="10" height="50" color="#002"></a-plane>
+				<a-plane position="0 -5 -25" rotation="-90 0 0" width="10" height="50" color="#020"></a-plane>
+				<a-plane position="0 5 -25" rotation="90 0 0" width="10" height="50" color="#200"></a-plane>
+				<a-plane position="-5 0 -25" rotation="0 90 90" width="10" height="50" color="#220"></a-plane>
+			</a-entity>
+
+			<a-sky color="#105"></a-sky>
+		</a-scene>
+		<div id="info">
+			<h3 id="speed"></h3>
+		</div>
+		<script type="text/javascript">
+		var tunnelPiece=document.getElementById("tunnel-base"), camera=document.getElementById("camera"),scene=document.getElementById("scene"), speedCont=document.getElementById("speed");
+		var position=0, speed=.1, campos={x:0,y:0,z:0},;
+		var tunnels=[tunnelPiece], obstacles=[];
+		function stop(){
+			clearInterval(fwd);
+		}
+		var fwd=setInterval(function(){
+			camera.setAttribute("position",campos.x+" "+campos.y+" "+campos.z);
+			campos.z-=speed;
+			speedCont.innerHTML=speed.toFixed(3);
+
+			// check for next tunnel piece
+			if(Math.abs(campos.z-position)<=100){
+				addPiece();
+				speed*=1.005;
+			}
+		},5);
+		function addPiece(){
+			position-=50;
+			var newPiece=tunnelPiece.cloneNode(1);
+			newPiece.setAttribute("position","0 0 "+position);
+			scene.append(newPiece);
+			tunnels.push(newPiece);
+			if(tunnels.length>4){
+				scene.removeChild(tunnels[0]);
+				tunnels.splice(0,1); // rimuovo il primo elemento
+			}
+		}
+		function addRandomObstacle(){
+			var side = parseInt(Math.random()*4);
+			var dist = -parseInt(Math.random()*20+50-campos.z);
+			console.log("random dist: ",dist,"| campos: ",campos);
+			var pos = "";
+			switch(side){
+				case 0: pos="-2.5 -2.5 "+dist; break;
+				case 1: pos="2.5 -2.5 "+dist; break;
+				case 2: pos="-2.5 2.5 "+dist; break;
+				case 3: pos="2.5 2.5 "+dist; break;
+			}
+			var obs=document.createElement("a-box");
+			console.log(pos);
+			obs.setAttribute("position",pos);
+			obs.setAttribute("scale","5 5 5");
+			obs.setAttribute("color","#0f0");
+			scene.append(obs);
+			obstacles.push(obs);
+			/*
+			var tr=[];
+			for(var k=0;k<obstacles.length;++k){
+				var pos=obstacles[k].getAttribute("position");
+				console.log(k,pos,campos.z);
+				if(pos.z>campos.z){
+					scene.removeChild(obstacles[k]);
+					tr.push=k;
+				}
+			}
+			console.log("Removing ",tr.length," obst");
+			for(var k=0;k<tr.length;++k){
+				obstacles.splice(tr[k],1);
+			} //*/
+		}
+		function getPos(){
+			for(var k=0;k<obstacles.length;++k)
+				console.log(k,obstacles[k].getAttribute("position"));
+		}
+		function
+		</script>
+	</body>
+</html>
