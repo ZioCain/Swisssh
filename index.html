@@ -3,14 +3,33 @@
 		<title>Swisssh</title>
 		<script src="https://aframe.io/releases/0.8.0/aframe.min.js"></script>
 		<style>
+		html,body{
+			background:#000;
+			color:#fff;
+			font-family: monospace;
+		}
 		#info{
 			position: fixed;
 			top:0;
 			left:0;
-			z-index: 10;
-			color:#fff;
-			font-family: monospace;
+			z-index: 2;
 			padding:1rem;
+		}
+		#gameover{
+			position: fixed;
+			top:0;
+			left:0;
+			width:100vw;
+			height:100vh;
+			z-index:3;
+			background-color:rgba(0,0,0,0.5);
+			display: none;
+		}
+		#gameover h1{
+			position: absolute;
+			top:50%;
+			left:50%;
+			transform: translate(-50%,-50%);
 		}
 		</style>
 	</head>
@@ -29,9 +48,12 @@
 		<div id="info">
 			<h3 id="speed"></h3>
 		</div>
+		<div id="gameover">
+			<h1>! GAME OVER !</h1>
+		</div>
 		<script type="text/javascript">
 		var tunnelPiece=document.getElementById("tunnel-base"), camera=document.getElementById("camera"),scene=document.getElementById("scene"), speedCont=document.getElementById("speed");
-		var position=0, speed=.1, campos={x:0,y:0,z:0}, waitFor=400, resetWaitFor=400;
+		var position=0, speed=.1, campos={x:0,y:0,z:0}, waitFor=300, resetWaitFor=300;
 		var tunnels=[tunnelPiece], obstacles=[];
 		var colors=["#1abc9c","#2ecc71","#3498db","#9b59b6","#34495e","#f1c40f","#e67e22","#e74c3c","#ecf0f1","#95a5a6"];
 		function stop(){
@@ -41,14 +63,17 @@
 			camera.setAttribute("position",campos.x+" "+campos.y+" "+campos.z);
 			campos.z-=speed;
 			speedCont.innerHTML=speed.toFixed(3);
-			if(--waitFor==0){
+			if(--waitFor<=0){
 				waitFor=resetWaitFor;
-				resetWaitFor=Math.random()*100+400;
+				resetWaitFor=Math.random()*200+200;
 				addRandomObstacle();
 			}
 			//check collisions
 			for(var k=0;k<obstacles.length;++k){
-
+				var pos=obstacles[k].getAttribute("position");
+				if(Math.abs(pos.x-campos.x)<=2.5 && Math.abs(pos.y-campos.y)<=2.5 && Math.abs(pos.z-campos.z)<=2.5){
+					gameover();
+				}
 			}
 
 			// check for next tunnel piece
@@ -85,27 +110,15 @@
 			scene.append(obs);
 			obstacles.push(obs);
 
-			if(obstacles.length>15){
+			if(obstacles.length>10){
+				scene.removeChild(obstacles[0]);
 				obstacles.splice(0,1);
 			}
-			/*
-			var tr=[];
-			for(var k=0;k<obstacles.length;++k){
-				var pos=obstacles[k].getAttribute("position");
-				console.log(k,pos,campos.z);
-				if(pos.z>campos.z){
-					scene.removeChild(obstacles[k]);
-					tr.push=k;
-				}
-			}
-			console.log("Removing ",tr.length," obst");
-			for(var k=0;k<tr.length;++k){
-				obstacles.splice(tr[k],1);
-			} //*/
 		}
-		function getPos(){
-			for(var k=0;k<obstacles.length;++k)
-				console.log(k,obstacles[k].getAttribute("position"));
+		function gameover(){
+			console.log("gameover");
+			stop();
+			document.getElementById("gameover").style.display="block";
 		}
 		function handleKeypress(e){
 			var key=e.key;
