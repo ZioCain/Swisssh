@@ -14,7 +14,7 @@
 		}
 		</style>
 	</head>
-	<body>
+	<body onkeydown="handleKeypress(event)">
 		<a-scene id="scene">
 			<a-camera id="camera" wasd-controls-enabled="false"></a-camera>
 			<a-entity id="tunnel-base">
@@ -31,8 +31,9 @@
 		</div>
 		<script type="text/javascript">
 		var tunnelPiece=document.getElementById("tunnel-base"), camera=document.getElementById("camera"),scene=document.getElementById("scene"), speedCont=document.getElementById("speed");
-		var position=0, speed=.1, campos={x:0,y:0,z:0},;
+		var position=0, speed=.1, campos={x:0,y:0,z:0}, waitFor=400, resetWaitFor=400;
 		var tunnels=[tunnelPiece], obstacles=[];
+		var colors=["#1abc9c","#2ecc71","#3498db","#9b59b6","#34495e","#f1c40f","#e67e22","#e74c3c","#ecf0f1","#95a5a6"];
 		function stop(){
 			clearInterval(fwd);
 		}
@@ -40,6 +41,15 @@
 			camera.setAttribute("position",campos.x+" "+campos.y+" "+campos.z);
 			campos.z-=speed;
 			speedCont.innerHTML=speed.toFixed(3);
+			if(--waitFor==0){
+				waitFor=resetWaitFor;
+				resetWaitFor=Math.random()*100+400;
+				addRandomObstacle();
+			}
+			//check collisions
+			for(var k=0;k<obstacles.length;++k){
+
+			}
 
 			// check for next tunnel piece
 			if(Math.abs(campos.z-position)<=100){
@@ -60,8 +70,7 @@
 		}
 		function addRandomObstacle(){
 			var side = parseInt(Math.random()*4);
-			var dist = -parseInt(Math.random()*20+50-campos.z);
-			console.log("random dist: ",dist,"| campos: ",campos);
+			var dist = -parseInt(80-campos.z);
 			var pos = "";
 			switch(side){
 				case 0: pos="-2.5 -2.5 "+dist; break;
@@ -70,12 +79,15 @@
 				case 3: pos="2.5 2.5 "+dist; break;
 			}
 			var obs=document.createElement("a-box");
-			console.log(pos);
 			obs.setAttribute("position",pos);
 			obs.setAttribute("scale","5 5 5");
-			obs.setAttribute("color","#0f0");
+			obs.setAttribute("color",colors[parseInt(Math.random()*10)]);
 			scene.append(obs);
 			obstacles.push(obs);
+
+			if(obstacles.length>15){
+				obstacles.splice(0,1);
+			}
 			/*
 			var tr=[];
 			for(var k=0;k<obstacles.length;++k){
@@ -95,7 +107,23 @@
 			for(var k=0;k<obstacles.length;++k)
 				console.log(k,obstacles[k].getAttribute("position"));
 		}
-		function
+		function handleKeypress(e){
+			var key=e.key;
+		    switch(key){
+		        case "ArrowRight":
+					campos.x=2.5;
+					break;
+		        case "ArrowDown":
+		            campos.y=-2.5;
+		            break;
+		        case "ArrowLeft":
+					campos.x=-2.5;
+					break;
+		        case "ArrowUp":
+					campos.y=2.5;
+		            break;
+		    }
+		}
 		</script>
 	</body>
 </html>
